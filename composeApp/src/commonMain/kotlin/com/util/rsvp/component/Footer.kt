@@ -44,6 +44,8 @@ fun Footer(
     onPlay: (Boolean) -> Unit,
     onForward: () -> Unit,
     onRewin: () -> Unit,
+    speedUp: () -> Unit,
+    speedDown: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -79,7 +81,11 @@ fun Footer(
                         onRewin = onRewin,
                         onForward = onForward
                     )
-                    Controller(modifier = Modifier.weight(weight = .2F), tempo = tempo)
+                    Controller(
+                        modifier = Modifier.weight(weight = .2F),
+                        tempo = tempo,
+                        speedUp = speedUp,
+                        speedDown = speedDown)
                 }
             )
         }
@@ -236,6 +242,8 @@ private fun Actions(
 private fun Controller(
     modifier: Modifier = Modifier,
     tempo: Long,
+    speedUp: () -> Unit,
+    speedDown: () -> Unit,
 ) {
     Box(
         modifier = modifier,
@@ -249,7 +257,11 @@ private fun Controller(
                 tint = Color(color = 0XFF616161),
                 contentDescription = ""
             )
-            Metronome(tempo = tempo)
+            Metronome(
+                tempo = tempo,
+                speedUp = speedUp,
+                speedDown = speedDown
+            )
         }
     )
 }
@@ -258,6 +270,8 @@ private fun Controller(
 private fun Metronome(
     modifier: Modifier = Modifier,
     tempo: Long,
+    speedUp: () -> Unit,
+    speedDown: () -> Unit,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -268,14 +282,22 @@ private fun Metronome(
         verticalAlignment = Alignment.CenterVertically,
         content = {
             Icon(
-                modifier = Modifier.size(size = 24.dp),
+                modifier = Modifier
+                    .size(size = 24.dp)
+                    .clickable {
+                        speedDown()
+                    },
                 imageVector = Icons.Rounded.Remove,
                 tint = Color(color = 0XFF616161),
                 contentDescription = ""
             )
             MetronomeLabel(tempo = tempo)
             Icon(
-                modifier = Modifier.size(size = 24.dp),
+                modifier = Modifier
+                    .size(size = 24.dp)
+                    .clickable {
+                        speedUp()
+                    },
                 imageVector = Icons.Rounded.Add,
                 tint = Color(color = 0XFF616161),
                 contentDescription = ""

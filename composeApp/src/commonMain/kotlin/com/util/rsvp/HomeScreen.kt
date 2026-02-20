@@ -7,7 +7,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,6 +22,7 @@ private const val LOREM =
 The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham."""
 
 private const val TIMELINE_MOVE_STEP = 10L
+private const val SPEED_STEP = 10L
 
 @Composable
 fun HomeScreen(
@@ -45,18 +45,19 @@ fun HomeScreen(
     var isPlay by remember { mutableStateOf(value = false) }
 
     LaunchedEffect(key1 = isPlay) {
-        if (offset > count || !isPlay) return@LaunchedEffect
+        if (offset >= count || !isPlay) return@LaunchedEffect
 
-        while (offset <= count) {
+        while (offset < count - 1) {
             offset++
             currentWord = stack[offset.toInt()]
-            delay(timeMillis = ((60 / tempo) * 1000))
+            delay(timeMillis = ((60.0 / tempo.coerceAtLeast(1)) * 1000).toLong().coerceAtLeast(1))
         }
     }
 
     LaunchedEffect(key1 = offset) {
-        currentWord = stack[offset.toInt()]
-        progress = ((offset * 100) / count)
+        val index = offset.coerceIn(0, count - 1).toInt()
+        currentWord = stack[index]
+        progress = if (count > 0) ((offset * 100) / count) else 0
     }
 
     Box(
@@ -86,6 +87,12 @@ fun HomeScreen(
                 onForward = {
                     offset =
                         if ((offset + TIMELINE_MOVE_STEP) >= (count - 1)) (count - 1) else (offset + TIMELINE_MOVE_STEP)
+                },
+                speedUp = {
+                    tempo += SPEED_STEP
+                },
+                speedDown = {
+                    tempo -= SPEED_STEP
                 }
             )
         }
