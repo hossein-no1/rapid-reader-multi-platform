@@ -2,6 +2,7 @@ package com.util.rsvp.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.FastForward
 import androidx.compose.material.icons.rounded.FastRewind
+import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.Tune
@@ -32,7 +33,18 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun Footer(modifier: Modifier = Modifier) {
+fun Footer(
+    modifier: Modifier = Modifier,
+    offset: Long,
+    count: Long,
+    progress: Long,
+    tempo: Long,
+    isPlay: Boolean,
+    onSeek: (Long) -> Unit,
+    onPlay: (Boolean) -> Unit,
+    onForward: () -> Unit,
+    onRewin: () -> Unit,
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -53,9 +65,21 @@ fun Footer(modifier: Modifier = Modifier) {
                     )
                     .padding(vertical = 16.dp, horizontal = 32.dp),
                 content = {
-                    TimeLine(modifier = modifier.weight(weight = .2F))
-                    Actions(modifier = modifier.weight(weight = .6F))
-                    Controller(modifier = Modifier.weight(weight = .2F))
+                    TimeLine(
+                        modifier = modifier.weight(weight = .2F),
+                        offset = offset,
+                        count = count,
+                        progress = progress,
+                        onSeek = onSeek
+                    )
+                    Actions(
+                        modifier = modifier.weight(weight = .6F),
+                        isPlay = isPlay,
+                        onPlay = onPlay,
+                        onRewin = onRewin,
+                        onForward = onForward
+                    )
+                    Controller(modifier = Modifier.weight(weight = .2F), tempo = tempo)
                 }
             )
         }
@@ -64,7 +88,11 @@ fun Footer(modifier: Modifier = Modifier) {
 
 @Composable
 private fun TimeLine(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    offset: Long,
+    count: Long,
+    progress: Long,
+    onSeek: (Long) -> Unit
 ) {
     Box(
         modifier = modifier,
@@ -76,10 +104,15 @@ private fun TimeLine(
                 content = {
                     SeekBar(
                         modifier = Modifier.fillMaxWidth(),
-                        current = 32,
-                        duration = 100,
-                        onSeek = {})
-                    TimeInformation()
+                        current = (offset + 1),
+                        duration = count,
+                        onSeek = onSeek
+                    )
+                    TimeInformation(
+                        count = count,
+                        offset = offset,
+                        progress = progress
+                    )
                 }
             )
         }
@@ -111,13 +144,22 @@ private fun SeekBar(
 
 @Composable
 private fun TimeInformation(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    offset: Long,
+    count: Long,
+    progress: Long,
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
         content = {
-            TimeLabel(modifier = Modifier.align(alignment = Alignment.CenterStart), text = "1/418")
-            TimeLabel(modifier = Modifier.align(alignment = Alignment.CenterEnd), text = "0%")
+            TimeLabel(
+                modifier = Modifier.align(alignment = Alignment.CenterStart),
+                text = "${offset}/${count}"
+            )
+            TimeLabel(
+                modifier = Modifier.align(alignment = Alignment.CenterEnd),
+                text = "${progress}%"
+            )
         }
     )
 }
@@ -133,7 +175,13 @@ private fun TimeLabel(modifier: Modifier = Modifier, text: String) {
 }
 
 @Composable
-private fun Actions(modifier: Modifier = Modifier) {
+private fun Actions(
+    modifier: Modifier = Modifier,
+    isPlay: Boolean,
+    onPlay: (Boolean) -> Unit,
+    onForward: () -> Unit,
+    onRewin: () -> Unit,
+) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
@@ -147,21 +195,33 @@ private fun Actions(modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
                 content = {
                     Icon(
-                        modifier = Modifier.size(size = 32.dp),
+                        modifier = Modifier
+                            .size(size = 32.dp)
+                            .clickable {
+                                onRewin()
+                            },
                         imageVector = Icons.Rounded.FastRewind,
                         tint = Color(color = 0XFF616161),
                         contentDescription = ""
                     )
 
                     Icon(
-                        modifier = Modifier.size(size = 32.dp),
-                        imageVector = Icons.Rounded.PlayArrow,
+                        modifier = Modifier
+                            .size(size = 32.dp)
+                            .clickable {
+                                onPlay(isPlay.not())
+                            },
+                        imageVector = if (isPlay) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                         tint = Color(color = 0XFFC71D25),
                         contentDescription = ""
                     )
 
                     Icon(
-                        modifier = Modifier.size(size = 32.dp),
+                        modifier = Modifier
+                            .size(size = 32.dp)
+                            .clickable {
+                                onForward()
+                            },
                         imageVector = Icons.Rounded.FastForward,
                         tint = Color(color = 0XFF616161),
                         contentDescription = ""
@@ -173,7 +233,10 @@ private fun Actions(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun Controller(modifier: Modifier = Modifier) {
+private fun Controller(
+    modifier: Modifier = Modifier,
+    tempo: Long,
+) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
@@ -186,13 +249,16 @@ private fun Controller(modifier: Modifier = Modifier) {
                 tint = Color(color = 0XFF616161),
                 contentDescription = ""
             )
-            Metronome()
+            Metronome(tempo = tempo)
         }
     )
 }
 
 @Composable
-private fun Metronome(modifier: Modifier = Modifier) {
+private fun Metronome(
+    modifier: Modifier = Modifier,
+    tempo: Long,
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(
@@ -207,7 +273,7 @@ private fun Metronome(modifier: Modifier = Modifier) {
                 tint = Color(color = 0XFF616161),
                 contentDescription = ""
             )
-            MetronomeLabel(text = "450")
+            MetronomeLabel(tempo = tempo)
             Icon(
                 modifier = Modifier.size(size = 24.dp),
                 imageVector = Icons.Rounded.Add,
@@ -219,7 +285,10 @@ private fun Metronome(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun MetronomeLabel(modifier: Modifier = Modifier, text: String) {
+private fun MetronomeLabel(
+    modifier: Modifier = Modifier,
+    tempo: Long,
+) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(
@@ -228,7 +297,7 @@ private fun MetronomeLabel(modifier: Modifier = Modifier, text: String) {
         ),
         content = {
             Text(
-                text = text,
+                text = "$tempo",
                 fontSize = 16.sp,
                 color = Color.White
             )
