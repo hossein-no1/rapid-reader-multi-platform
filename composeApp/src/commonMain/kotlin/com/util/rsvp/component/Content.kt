@@ -11,7 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
 
@@ -24,7 +25,7 @@ fun Content(modifier: Modifier = Modifier, text: String) {
     val centerChar = text[centerIndex].toString()
     val rightText = text.substring(centerIndex + 1)
 
-    val textStyle = TextStyle(fontSize = 32.sp)
+    val textStyle = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp, fontWeight = FontWeight.Bold)
     val textMeasurer = rememberTextMeasurer()
 
     val leftWidth = textMeasurer.measure(

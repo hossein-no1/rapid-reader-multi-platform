@@ -17,7 +17,7 @@ fun LocalTheme(
 
     MaterialTheme(
         colorScheme = colors,
-        typography = AppTypography,
+        typography = appTypography(),
         shapes = AppShapes,
         content = content
     )

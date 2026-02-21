@@ -182,7 +182,7 @@ private fun TimeLabel(modifier: Modifier = Modifier, text: String) {
         modifier = modifier,
         text = text,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        fontSize = 14.sp
+        style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp),
     )
 }
 
@@ -320,20 +320,21 @@ private fun MetronomeLabel(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(
-            space = 6.dp,
+            space = 4.dp,
             alignment = Alignment.CenterHorizontally
         ),
+        verticalAlignment = Alignment.CenterVertically,
         content = {
             Text(
                 text = "$tempo",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
             )
 
             Text(
                 text = "WPM",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp),
             )
         }
     )

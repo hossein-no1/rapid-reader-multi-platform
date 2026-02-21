@@ -59,7 +59,6 @@ fun App() {
         val target = revealTargetDark ?: return@LaunchedEffect
 
         if (rootSize == IntSize.Zero || fabCenterInRootPx == Offset.Unspecified) {
-            // Theme may have already been flipped at click time; just cancel reveal.
             revealFromDark = null
             revealTargetDark = null
             return@LaunchedEffect
