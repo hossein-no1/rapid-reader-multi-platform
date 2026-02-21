@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -57,15 +57,15 @@ fun Content(modifier: Modifier = Modifier, text: String) {
             modifier = Modifier.offset(x = -offsetDp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(leftText, style = textStyle, color = Color.White)
+            Text(leftText, style = textStyle, color = MaterialTheme.colorScheme.onBackground)
 
             Text(
                 text = centerChar,
                 style = textStyle,
-                color = Color.Red
+                color = MaterialTheme.colorScheme.primary
             )
 
-            Text(rightText, style = textStyle, color = Color.White)
+            Text(rightText, style = textStyle, color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }

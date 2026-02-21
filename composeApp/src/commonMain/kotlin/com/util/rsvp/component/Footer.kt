@@ -22,13 +22,13 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -58,12 +58,12 @@ fun Footer(
                     .fillMaxSize()
                     .padding(start = 24.dp, end = 24.dp, bottom = 48.dp)
                     .background(
-                        color = Color(0XFF111111),
+                        color = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(size = 32.dp)
                     )
                     .border(
                         width = 1.dp,
-                        color = Color(0xFF1F1F1F),
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(size = 32.dp)
                     )
                     .padding(vertical = 16.dp, horizontal = 32.dp),
@@ -147,8 +147,9 @@ private fun SeekBar(
         },
         valueRange = 0f..1f,
         colors = SliderDefaults.colors(
-            thumbColor = Color.White,
-            activeTrackColor = Color(color = 0XFFC71D25),
+            thumbColor = MaterialTheme.colorScheme.onSurface,
+            activeTrackColor = MaterialTheme.colorScheme.primary,
+            activeTickColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }
@@ -180,7 +181,7 @@ private fun TimeLabel(modifier: Modifier = Modifier, text: String) {
     Text(
         modifier = modifier,
         text = text,
-        color = Color(0xFF353535),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontSize = 14.sp
     )
 }
@@ -212,7 +213,7 @@ private fun Actions(
                                 onRewin()
                             },
                         imageVector = Icons.Rounded.FastRewind,
-                        tint = Color(color = 0XFF616161),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         contentDescription = ""
                     )
 
@@ -223,7 +224,7 @@ private fun Actions(
                                 onPlay(isPlay.not())
                             },
                         imageVector = if (isPlay) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                        tint = Color(color = 0XFFC71D25),
+                        tint = MaterialTheme.colorScheme.primary,
                         contentDescription = ""
                     )
 
@@ -234,7 +235,7 @@ private fun Actions(
                                 onForward()
                             },
                         imageVector = Icons.Rounded.FastForward,
-                        tint = Color(color = 0XFF616161),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         contentDescription = ""
                     )
                 }
@@ -259,7 +260,7 @@ private fun Controller(
                     .size(size = 24.dp)
                     .align(alignment = Alignment.CenterStart),
                 imageVector = Icons.Rounded.Tune,
-                tint = Color(color = 0XFF616161),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = ""
             )
             Metronome(
@@ -293,7 +294,7 @@ private fun Metronome(
                         speedDown()
                     },
                 imageVector = Icons.Rounded.Remove,
-                tint = Color(color = 0XFF616161),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = ""
             )
             MetronomeLabel(tempo = tempo)
@@ -304,7 +305,7 @@ private fun Metronome(
                         speedUp()
                     },
                 imageVector = Icons.Rounded.Add,
-                tint = Color(color = 0XFF616161),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = ""
             )
         }
@@ -326,13 +327,13 @@ private fun MetronomeLabel(
             Text(
                 text = "$tempo",
                 fontSize = 16.sp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = "WPM",
                 fontSize = 14.sp,
-                color = Color(color = 0XFF616161)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     )
