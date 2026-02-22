@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material3.Icon
@@ -45,7 +46,7 @@ fun App() {
     val systemDark = isSystemInDarkTheme()
     var isDark by remember(systemDark) { mutableStateOf(value = systemDark) }
 
-    val homeState = rememberHomeState()
+    var route: AppRoute by remember { mutableStateOf(AppRoute.Gate) }
 
     var rootSize by remember { mutableStateOf(IntSize.Zero) }
     var fabCenterInRootPx by remember { mutableStateOf(Offset.Unspecified) }
@@ -85,10 +86,20 @@ fun App() {
                 .fillMaxSize()
                 .onSizeChanged { rootSize = it },
         ) {
-            HomeScreen(
-                modifier = Modifier.fillMaxSize(),
-                state = homeState,
-            )
+            when (val r = route) {
+                AppRoute.Gate -> GateScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    onContinue = { text -> route = AppRoute.Home(text = text) },
+                )
+
+                is AppRoute.Home -> {
+                    val homeState = rememberHomeState(lorem = r.text)
+                    HomeScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        state = homeState,
+                    )
+                }
+            }
 
             if (revealActive) {
                 val fromDark = revealFromDark ?: !isDark
@@ -150,6 +161,22 @@ fun App() {
                     },
                     contentDescription = "Toggle theme",
                 )
+            }
+
+            if (route is AppRoute.Home) {
+                IconButton(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(16.dp)
+                        .offset(y = 16.dp),
+                    onClick = { route = AppRoute.Gate },
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        contentDescription = "Back",
+                    )
+                }
             }
 
             if (revealActive) {
