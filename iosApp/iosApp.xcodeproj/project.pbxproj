@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		A89894B58E524485704BA771 /* Rsvp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rsvp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A89894B58E524485704BA771 /* RapidReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RapidReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -59,7 +59,7 @@
 		FFA14B710F686C5EB6F67D28 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A89894B58E524485704BA771 /* Rsvp.app */,
+				A89894B58E524485704BA771 /* RapidReader.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,7 +87,7 @@
 			packageProductDependencies = (
 			);
 			productName = iosApp;
-			productReference = A89894B58E524485704BA771 /* Rsvp.app */;
+			productReference = A89894B58E524485704BA771 /* RapidReader.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

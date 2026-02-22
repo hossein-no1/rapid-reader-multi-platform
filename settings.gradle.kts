@@ -1,4 +1,4 @@
-rootProject.name = "Rsvp"
+rootProject.name = "RapidReader"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

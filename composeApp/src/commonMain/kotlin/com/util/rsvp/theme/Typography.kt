@@ -1,17 +1,17 @@
 package com.util.rsvp.theme
 
-import androidx.compose.runtime.Composable
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
-import rsvp.composeapp.generated.resources.Res
-import rsvp.composeapp.generated.resources.bold
-import rsvp.composeapp.generated.resources.medium
-import rsvp.composeapp.generated.resources.regular
-import rsvp.composeapp.generated.resources.semi_bold
+import rapidreader.composeapp.generated.resources.Res
+import rapidreader.composeapp.generated.resources.bold
+import rapidreader.composeapp.generated.resources.medium
+import rapidreader.composeapp.generated.resources.regular
+import rapidreader.composeapp.generated.resources.semi_bold
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

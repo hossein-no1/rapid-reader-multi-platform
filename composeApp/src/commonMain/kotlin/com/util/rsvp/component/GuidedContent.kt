@@ -40,8 +40,8 @@ fun GuidedContent(
 ) {
     if (text.isEmpty()) return
 
-    val focusedTextColor = Color.White
-    val unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
+    val focusedTextColor = MaterialTheme.colorScheme.onBackground
+    val unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
 
     val textStyle = MaterialTheme.typography.bodyLarge.copy(
         fontSize = 18.sp,
