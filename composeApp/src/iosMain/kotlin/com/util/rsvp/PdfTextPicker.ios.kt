@@ -17,6 +17,8 @@ actual fun rememberPdfTextPicker(
 ): PdfTextPicker? {
     return remember(onResult) {
         object : PdfTextPicker {
+            private var delegateRef: UIDocumentPickerDelegateProtocol? = null
+
             override fun launch() {
                 val picker = UIDocumentPickerViewController(
                     documentTypes = listOf("com.adobe.pdf"),
@@ -39,6 +41,7 @@ actual fun rememberPdfTextPicker(
                     }
                 }
 
+                delegateRef = delegate
                 picker.delegate = delegate
 
                 val root = topViewController() ?: return

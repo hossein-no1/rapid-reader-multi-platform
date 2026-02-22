@@ -36,10 +36,17 @@ fun GateScreen(
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(space =  12.dp, alignment = Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(
+            space = 12.dp,
+            alignment = Alignment.CenterVertically
+        ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(text = "Paste text or pick a PDF")
+        Text(
+            text = "Paste text or pick a PDF",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium
+        )
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
