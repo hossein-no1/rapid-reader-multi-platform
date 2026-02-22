@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,8 @@ actual fun rememberPdfTextPicker(
     onResult: (String) -> Unit,
 ): PdfTextPicker? {
     val context = LocalContext.current
+    // pdfbox-android needs one-time init.
+    remember(context) { PDFBoxResourceLoader.init(context) }
     val scope = rememberCoroutineScope()
 
     val launcher = rememberLauncherForActivityResult(
