@@ -28,13 +28,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.Dispatchers
+import com.util.rsvp.extractTextFromPdf
+import kotlinx.browser.document
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.text.PDFTextStripper
-import java.awt.FileDialog
-import java.io.File
+import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.events.Event
 
 @Composable
 actual fun InputPDF(
@@ -57,38 +55,35 @@ actual fun InputPDF(
                     successMessage = null
                     errorMessage = null
 
-                    val dialog = FileDialog(
-                        null as java.awt.Frame?,
-                        "Select PDF",
-                        FileDialog.LOAD,
-                    ).apply {
-                        isMultipleMode = false
-                        setFilenameFilter { _, name -> name.endsWith(".pdf", ignoreCase = true) }
-                        isVisible = true
+                    val input = (document.createElement("input") as HTMLInputElement).apply {
+                        type = "file"
+                        accept = "application/pdf"
                     }
 
-                    val dir = dialog.directory ?: return@clickable
-                    val fileName = dialog.file ?: return@clickable
-                    val picked = File(dir, fileName)
-
-                    if (!picked.extension.equals("pdf", ignoreCase = true)) {
-                        pickedFileName = null
-                        errorMessage = "Please pick a .pdf file."
-                        return@clickable
-                    }
-
-                    pickedFileName = picked.name
-                    scope.launch {
-                        val text = withContext(Dispatchers.IO) { extractTextFromPdf(picked) }
-                        if (text.isNullOrBlank()) {
-                            errorMessage = "Couldn’t read this PDF."
+                    input.onchange = onchange@{ _: Event ->
+                        val file = input.files?.item(0) ?: return@onchange
+                        if (!file.name.endsWith(".pdf", ignoreCase = true)) {
+                            pickedFileName = null
                             successMessage = null
-                        } else {
-                            onResult(text)
-                            successMessage = "File uploaded successfully."
-                            errorMessage = null
+                            errorMessage = "Please pick a .pdf file."
+                            return@onchange
+                        }
+
+                        pickedFileName = file.name
+                        scope.launch {
+                            val text = runCatching { extractTextFromPdf(file) }.getOrDefault("")
+                            if (text.isBlank()) {
+                                errorMessage = "Couldn’t read this PDF."
+                                successMessage = null
+                            } else {
+                                onResult(text)
+                                successMessage = "File uploaded successfully."
+                                errorMessage = null
+                            }
                         }
                     }
+
+                    input.click()
                 }
                 .drawBehind {
                     val strokeWidth = 2.dp.toPx()
@@ -145,14 +140,6 @@ actual fun InputPDF(
                 )
             }
         }
-    }
-}
-
-private fun extractTextFromPdf(file: File): String? {
-    if (!file.exists() || !file.isFile) return null
-    if (!file.extension.equals("pdf", ignoreCase = true)) return null
-    return PDDocument.load(file).use { doc ->
-        PDFTextStripper().getText(doc)
     }
 }
 
