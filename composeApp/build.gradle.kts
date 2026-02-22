@@ -80,6 +80,10 @@ compose.desktop {
     application {
         mainClass = "com.util.rsvp.MainKt"
 
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("compose-desktop.pro"))
+        }
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "RapidReader"

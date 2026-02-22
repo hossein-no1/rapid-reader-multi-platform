@@ -1,63 +1,60 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web.
+## 1) Intro
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+**RapidReader** is a Compose Multiplatform app for focused reading using RSVP (Rapid Serial Visual Presentation).
+You can start from a **PDF file**, a **link**, or **pasted text**, and the app presents the content word-by-word for distraction-free reading across platforms.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## 2) Targets supported
 
-### Build and Run Android Application
+- **Android** (Compose)
+- **Desktop (JVM)**: macOS (DMG), Windows (MSI), Linux (DEB)
+- **iOS**: device (arm64) + simulator (arm64)
+- **Web**: Kotlin/Wasm + Kotlin/JS browser targets
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
+## 3) Configuration guide
+
+### Prerequisites
+
+- **Gradle wrapper**: use `./gradlew` (or `.\gradlew.bat` on Windows)
+- **JDK**:
+  - For day-to-day development, a standard JDK is fine.
+  - For **Desktop packaging**, you need a full JDK that includes **`jpackage`**. If packaging fails, set `org.gradle.java.home` in `gradle.properties` to that JDK’s home.
+
+### Run targets
+
+- **Android**
+
   ```shell
   ./gradlew :composeApp:assembleDebug
   ```
-- on Windows
+
+- **Desktop (run)**
+
   ```shell
-  .\gradlew.bat :composeApp:assembleDebug
+  ./gradlew :composeApp:run
   ```
 
-### Build and Run Web Application
+- **Desktop (package installers)**
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+  ```shell
+  # Depending on your Compose Desktop plugin version, these may be either:
+  # - packageDmg / packageMsi / packageDeb
+  # - packageReleaseDmg / packageReleaseMsi / packageReleaseDeb
+  ./gradlew :composeApp:packageDmg
+  ./gradlew :composeApp:packageMsi
+  ./gradlew :composeApp:packageDeb
+  ```
 
-### Build and Run iOS Application
+- **Web (Wasm — modern browsers)**
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+  ```shell
+  ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
+  ```
 
----
+- **Web (JS — wider browser support)**
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+  ```shell
+  ./gradlew :composeApp:jsBrowserDevelopmentRun
+  ```
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+- **iOS**
+  - Open `iosApp` in Xcode and run the iOS app target.
