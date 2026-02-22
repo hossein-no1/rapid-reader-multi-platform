@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.util.rsvp.component.InputPDF
 import com.util.rsvp.model.PdfHistoryItem
+import kotlinx.coroutines.launch
 
 @Composable
 fun GateScreen(
@@ -50,11 +53,22 @@ fun GateScreen(
     onPdfPicked: (PdfHistoryItem) -> Unit,
 ) {
 
-    var text by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    var fileText by remember { mutableStateOf("") }
+    var urlText by remember { mutableStateOf("") }
+    var pasteText by remember { mutableStateOf("") }
+
     var url by remember { mutableStateOf("") }
-    var paste by remember { mutableStateOf("") }
+    var urlState by remember { mutableStateOf<UrlDownloadState>(UrlDownloadState.Idle) }
+
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("File", "Link", "Paste")
+    val currentText = when (selectedTabIndex) {
+        0 -> fileText
+        1 -> urlText
+        else -> pasteText
+    }
 
     Box(
         modifier = modifier
@@ -166,28 +180,53 @@ fun GateScreen(
                                         0 -> InputPDF(
                                             modifier = Modifier.fillMaxWidth(),
                                             onPicked = onPdfPicked,
-                                            onResult = { text = it },
+                                            onResult = { fileText = it },
                                         )
 
                                         1 -> InputUrl(
                                             modifier = Modifier.fillMaxWidth(),
                                             value = url,
-                                            onValueChange = { url = it },
+                                            onValueChange = {
+                                                url = it
+                                                urlState = UrlDownloadState.Idle
+                                                urlText = ""
+                                            },
+                                            downloadState = urlState,
+                                            onDownloadClick = {
+                                                val input = url.trim()
+                                                if (!input.startsWith("http://") && !input.startsWith("https://")) {
+                                                    urlState = UrlDownloadState.Error("Please enter a valid http(s) URL.")
+                                                    urlText = ""
+                                                    return@InputUrl
+                                                }
+
+                                                urlState = UrlDownloadState.Loading
+                                                urlText = ""
+                                                scope.launch {
+                                                    val result = runCatching { downloadTextFromUrl(input) }.getOrNull().orEmpty()
+                                                    if (result.isBlank()) {
+                                                        urlState = UrlDownloadState.Error("Couldn’t download or read this link.")
+                                                    } else {
+                                                        urlText = result
+                                                        urlState = UrlDownloadState.Success("Downloaded successfully.")
+                                                    }
+                                                }
+                                            },
                                         )
 
                                         else -> InputPaste(
                                             modifier = Modifier.fillMaxWidth(),
-                                            value = paste,
-                                            onValueChange = { paste = it },
+                                            value = pasteText,
+                                            onValueChange = { pasteText = it },
                                         )
                                     }
                                 }
                             )
-                            Spacer(modifier = Modifier.height(height = 24.dp))
+                            Spacer(modifier = Modifier.height(height = 4.dp))
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
-                                enabled = text.isNotBlank(),
-                                onClick = { onContinue(text) },
+                                enabled = currentText.isNotBlank(),
+                                onClick = { onContinue(currentText) },
                                 shape = RoundedCornerShape(size = 8.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.onBackground,
@@ -213,6 +252,8 @@ private fun InputUrl(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
+    downloadState: UrlDownloadState,
+    onDownloadClick: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -220,6 +261,7 @@ private fun InputUrl(
         content = {
             OutlinedTextField(
                 value = value,
+                singleLine = true,
                 onValueChange = onValueChange,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(size = 8.dp),
@@ -238,8 +280,63 @@ private fun InputUrl(
                     )
                 }
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onDownloadClick,
+                    enabled = value.isNotBlank() && downloadState !is UrlDownloadState.Loading,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onBackground,
+                        contentColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                        disabledContentColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+                    ),
+                ) {
+                    Text(
+                        text = if (downloadState is UrlDownloadState.Loading) "Downloading…" else "Download",
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            }
+
+            when (downloadState) {
+                UrlDownloadState.Idle -> Unit
+                UrlDownloadState.Loading -> Text(
+                    text = "Downloading…",
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+
+                is UrlDownloadState.Success -> Text(
+                    text = downloadState.message,
+                    color = Color(0xFF2E7D32),
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+
+                is UrlDownloadState.Error -> Text(
+                    text = downloadState.message,
+                    color = Color(0xFFB00020),
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
     )
+}
+
+private sealed interface UrlDownloadState {
+    data object Idle : UrlDownloadState
+    data object Loading : UrlDownloadState
+    data class Success(val message: String) : UrlDownloadState
+    data class Error(val message: String) : UrlDownloadState
 }
 
 @Composable
