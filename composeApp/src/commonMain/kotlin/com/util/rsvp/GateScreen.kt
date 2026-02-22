@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -78,7 +79,8 @@ fun GateScreen(
         content = {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(fraction = .5F)
+                    .fillMaxWidth(fraction = .9F)
+                    .padding(horizontal = 16.dp)
                     .clip(shape = RoundedCornerShape(size = 8.dp))
                     .background(color = MaterialTheme.colorScheme.onBackground.copy(alpha = .05F)),
                 contentAlignment = Alignment.Center,

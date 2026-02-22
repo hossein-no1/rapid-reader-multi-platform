@@ -8,6 +8,7 @@ import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
+import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.writeToFile
 import platform.PDFKit.PDFDocument
 
