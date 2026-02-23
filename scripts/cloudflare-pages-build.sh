@@ -21,5 +21,6 @@ fi
 export JAVA_HOME="$(cd "${JDK_DIR}" && pwd)"
 export PATH="${JAVA_HOME}/bin:${PATH}"
 
-./gradlew ${GRADLE_ARGS:-} :composeApp:jsBrowserProductionWebpack
+# Override any machine-specific org.gradle.java.home set in gradle.properties.
+./gradlew -Dorg.gradle.java.home="${JAVA_HOME}" ${GRADLE_ARGS:-} :composeApp:jsBrowserProductionWebpack
 
