@@ -205,9 +205,12 @@ fun GateScreen(
                                                 urlState = UrlDownloadState.Loading
                                                 urlText = ""
                                                 scope.launch {
-                                                    val result = runCatching { downloadTextFromUrl(input) }.getOrNull().orEmpty()
+                                                    val (result, failure) = runCatching { downloadTextFromUrl(input) }
+                                                        .let { it.getOrNull().orEmpty() to it.exceptionOrNull() }
                                                     if (result.isBlank()) {
-                                                        urlState = UrlDownloadState.Error("Couldn’t download or read this link.")
+                                                        urlState = UrlDownloadState.Error(
+                                                            failure?.message ?: "Couldn’t download or read this link."
+                                                        )
                                                     } else {
                                                         urlText = result
                                                         urlState = UrlDownloadState.Success("Downloaded successfully.")

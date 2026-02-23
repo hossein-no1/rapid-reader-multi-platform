@@ -50,6 +50,16 @@ internal suspend fun extractTextFromPdf(file: File): String {
     val buffer = withContext(Dispatchers.Default) { file.readAsArrayBuffer() }
     val data = Uint8Array(buffer)
 
+    return extractTextFromPdfData(pdfjs, data)
+}
+
+internal suspend fun extractTextFromPdf(buffer: ArrayBuffer): String {
+    val pdfjs = pdfjsLib() ?: return ""
+    val data = Uint8Array(buffer)
+    return extractTextFromPdfData(pdfjs, data)
+}
+
+private suspend fun extractTextFromPdfData(pdfjs: PdfJsLib, data: Uint8Array): String {
     val pdf = pdfjs
         .getDocument(pdfDocParams(data))
         .promise

@@ -45,11 +45,12 @@ actual fun rememberPdfImportController(
                     }
 
                     scope.launch {
-                        val text = withContext(Dispatchers.Default) {
-                            runCatching { extractTextFromPdf(file) }.getOrDefault("")
+                        val (text, failure) = withContext(Dispatchers.Default) {
+                            val result = runCatching { extractTextFromPdf(file) }
+                            result.getOrDefault("") to result.exceptionOrNull()
                         }
                         if (text.isBlank()) {
-                            onError("Couldn’t read this PDF.")
+                            onError(failure?.message ?: "Couldn’t read this PDF.")
                         } else {
                             val item = PdfHistoryItem(
                                 name = file.name,
@@ -72,7 +73,7 @@ actual fun rememberPdfImportController(
 
 private suspend fun extractTextFromPdf(file: File): String {
     val buffer = file.readAsArrayBuffer()
-    val pdfjsLib = js("window.pdfjsLib")
+    val pdfjsLib = js("globalThis.pdfjsLib")
     if (pdfjsLib == null) return ""
 
     val data = Uint8Array(buffer)

@@ -8,9 +8,10 @@
     <link type="text/css" rel="stylesheet" href="styles.css">
     <script type="module">
         import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.min.mjs";
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.worker.min.mjs";
-        window.pdfjsLib = pdfjsLib;
+        // Expose pdfjsLib for Kotlin/JS + Kotlin/Wasm consumers.
         globalThis.pdfjsLib = pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.worker.min.mjs";
     </script>
 </head>
 <body style="text-align: center; align-content: center">

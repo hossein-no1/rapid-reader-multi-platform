@@ -15,27 +15,56 @@ import kotlin.coroutines.resumeWithException
 internal actual suspend fun downloadTextFromUrl(
     url: String,
 ): String {
-    val response = window.fetch(url).await()
-    if (!response.ok) return ""
+    val response = runCatching { window.fetch(url).await() }
+        .getOrElse { t ->
+            // Most common on web: CORS blocks cross-origin downloads ("TypeError: Failed to fetch").
+            runCatching { fetchViaProxy(url) }.getOrElse { proxyFailure ->
+                throw IllegalStateException(
+                    t.message
+                        ?: proxyFailure.message
+                        ?: "Failed to fetch. This is usually blocked by CORS on the target site.",
+                    t,
+                )
+            }
+        }
+    if (!response.ok) {
+        val status = response.status
+        val statusText = response.statusText
+        throw IllegalStateException("HTTP $status $statusText")
+    }
 
     val contentType = response.headers.get("content-type").orEmpty()
     val looksLikePdf = contentType.contains("pdf", ignoreCase = true) ||
         url.substringBefore('?').endsWith(".pdf", ignoreCase = true)
 
     return if (looksLikePdf) {
-        val blob = response.blob().await()
-        val file = js("new File([blob], 'download.pdf', { type: blob.type || 'application/pdf' })")
-            .unsafeCast<File>()
-        extractTextFromPdfJs(file)
+        val pdfText = runCatching {
+            val blob = response.blob().await()
+            val file = js("new File([blob], 'download.pdf', { type: blob.type || 'application/pdf' })")
+                .unsafeCast<File>()
+            extractTextFromPdfJs(file)
+        }.getOrElse { t ->
+            throw IllegalStateException(t.message ?: "Failed to parse PDF.", t)
+        }
+
+        if (pdfText.isBlank()) {
+            throw IllegalStateException("Downloaded PDF, but no extractable text was found.")
+        }
+        pdfText
     } else {
         response.text().await()
     }
 }
 
+private suspend fun fetchViaProxy(url: String) =
+    window.fetch("/api/proxy?url=" + js("encodeURIComponent(url)").unsafeCast<String>()).await()
+
 private suspend fun extractTextFromPdfJs(file: File): String {
     val buffer = withContext(Dispatchers.Default) { file.readAsArrayBuffer() }
     val pdfjsLib = js("window.pdfjsLib")
-    if (pdfjsLib == null) return ""
+    if (pdfjsLib == null) {
+        throw IllegalStateException("PDF engine not loaded. Please refresh and try again.")
+    }
 
     val data = Uint8Array(buffer)
     val loadingTask = pdfjsLib.getDocument(js("{ data: data }"))

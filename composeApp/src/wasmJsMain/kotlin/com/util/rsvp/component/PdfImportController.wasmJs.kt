@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package com.util.rsvp.component
 
 import androidx.compose.runtime.Composable
@@ -38,11 +40,12 @@ actual fun rememberPdfImportController(
                     }
 
                     scope.launch {
-                        val text = withContext(Dispatchers.Default) {
-                            runCatching { extractTextFromPdf(file.unsafeCast<File>()) }.getOrDefault("")
+                        val (text, failure) = withContext(Dispatchers.Default) {
+                            val result = runCatching { extractTextFromPdf(file.unsafeCast<File>()) }
+                            result.getOrDefault("") to result.exceptionOrNull()
                         }
                         if (text.isBlank()) {
-                            onError("Couldn’t read this PDF.")
+                            onError(failure?.message ?: "Couldn’t read this PDF.")
                         } else {
                             val item = PdfHistoryItem(
                                 name = file.name,

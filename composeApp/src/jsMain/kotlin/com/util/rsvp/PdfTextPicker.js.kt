@@ -84,7 +84,7 @@ actual fun rememberPdfTextDropListener(
 
 private suspend fun extractTextFromPdf(file: File): String {
     val buffer = withContext(Dispatchers.Default) { file.readAsArrayBuffer() }
-    val pdfjsLib = js("window.pdfjsLib")
+    val pdfjsLib = js("globalThis.pdfjsLib")
     if (pdfjsLib == null) return ""
 
     val data = Uint8Array(buffer)
